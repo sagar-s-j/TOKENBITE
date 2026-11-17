@@ -77,6 +77,31 @@ h1{font-size:clamp(2rem,5.6vw,3.9rem)}.sub{font-size:1.1rem;color:var(--mu);marg
 #tt{position:fixed;top:76px;left:50%;transform:translate(-50%,-30px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:99px;font-weight:600;opacity:0;transition:all .35s cubic-bezier(.2,1.2,.3,1);z-index:70;pointer-events:none}#tt.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:760px){.hero{grid-template-columns:1fr;padding-top:4vh}.nv a{display:none}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
+
+/* ===== WOW layer: cursor trail, hero motion, reveals ===== */
+.trail{position:fixed;inset:0;z-index:9999;pointer-events:none;transition:opacity .3s}
+.trail svg{position:absolute;inset:0;width:100%;height:100%}
+.trail path{fill:none;stroke:#0B2B2A;stroke-opacity:.25;stroke-width:2.2;stroke-linecap:round}
+.tb{position:absolute;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:19px;box-shadow:0 3px 10px #0B2B2A33,inset 0 0 0 1.5px #0B2B2A14;will-change:transform}
+.bst,.fly{position:fixed;z-index:9998;pointer-events:none;margin:-12px 0 0 -12px;font-size:24px}
+.btn{position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s,translate .25s cubic-bezier(.2,.9,.3,1.3)}
+.btn.t:not(.sm)::before{content:'';position:absolute;top:0;left:-70%;width:40%;height:100%;background:linear-gradient(100deg,transparent,#ffffffaa,transparent);transform:skewX(-20deg);animation:shn 3.4s 1.8s infinite}
+@keyframes shn{0%{left:-70%}28%,100%{left:140%}}
+.hero{position:relative}.hero>.fz+div{position:relative;z-index:1}
+.tkt{z-index:1;animation-fill-mode:backwards;transition:transform .25s ease-out}
+.tkt::after{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at var(--sx,50%) var(--sy,0%),#ffffffcc,transparent 55%);opacity:0;transition:opacity .3s;pointer-events:none}.tkt:hover::after{opacity:.8}
+.fz{position:absolute;inset:0;pointer-events:none;z-index:0}
+.fz span{position:absolute;font-size:clamp(1.6rem,3vw,2.6rem);opacity:.4;animation:fz 5s calc(var(--i)*-.8s) ease-in-out infinite alternate;translate:calc(var(--px,0)*var(--k)*46px) calc(var(--py,0)*var(--k)*46px)}
+@keyframes fz{to{transform:translateY(-16px) rotate(10deg)}}
+@keyframes up{from{transform:translateY(110%) rotate(4deg)}to{transform:none}}
+.ln1{display:block;overflow:hidden;padding-bottom:.1em}.ln1 i{display:block;font-style:normal;animation:up .9s var(--d,0s) cubic-bezier(.2,.9,.2,1) both}
+.rv{opacity:0;transform:translateY(30px) scale(.96);transition:opacity .7s,transform .7s cubic-bezier(.2,.9,.3,1.2);transition-delay:calc(var(--i,0)*100ms)}.rv.v{opacity:1;transform:none}
+@keyframes wob{0%,100%{transform:none}30%{transform:scale(1.15) rotate(-8deg)}60%{transform:scale(1.05) rotate(6deg)}}
+.hc:hover .th{animation:wob .6s}
+#sp{position:fixed;inset:0;z-index:200;background:var(--tk);display:grid;place-content:center;justify-items:center;gap:18px;transition:transform .8s cubic-bezier(.7,0,.2,1)}#sp.go{transform:translateY(-100%)}
+.lg2{font-family:var(--d);font-weight:700;font-size:clamp(1.6rem,6vw,2.6rem);animation:pop .6s both}.lg2 i{font-style:normal;background:var(--ink);color:var(--tk);padding:0 10px;border-radius:8px;margin:0 6px}
+.bar2{width:170px;height:5px;border-radius:9px;background:#0B2B2A22;overflow:hidden}.bar2::after{content:'';display:block;height:100%;background:var(--ink);animation:fill 1.05s ease-in-out both}
+@keyframes fill{from{width:0}to{width:100%}}
 </style></head><body>
 <nav><a class="logo" onclick="go('home')">skip<i>the</i>queue</a><div class="nv"><a onclick="go('find')">Find food</a><a onclick="go('auth',{role:'o',mode:'up'})">For hotels</a><span id="u"></span></div></nav>
 <main id="v"></main><div id="cb"></div><div id="ov"><i></i><p>Processing payment</p></div><div id="tt"></div>
@@ -96,18 +121,18 @@ const hs=()=>SEED.concat(L('stq_h',[])),H=id=>hs().find(h=>h.id===id),OR=()=>L('
 if(!L('stq_w',null))S('stq_w',[{e:'demo@hotel.com',p:'Demo@123',h:'h1'}]);
 let ss=L('stq_s',null),cart={},cur=null,last=null,tm=null,fl='All',qq='',A={},pm=0,dt=0,cs=['All'];
 const R={};
-function go(v,a={}){clearInterval(tm);if(v!=='menu')$('#cb').className='';R[v](a);const m=$('#v');m.className='';void m.offsetWidth;m.className='in';scrollTo(0,0);nav()}
+function go(v,a={}){clearInterval(tm);if(v!=='menu')$('#cb').className='';R[v](a);const m=$('#v');m.className='';void m.offsetWidth;m.className='in';scrollTo(0,0);nav();reveal()}
 function nav(){$('#u').innerHTML=ss?`<button class="pill" onclick="go('${ss.r==='o'?'dash':'find'}')">${ss.r==='o'?'Dashboard':'Hi, '+esc(ss.n.split(' ')[0])}</button> <button class="pill g" onclick="out()">Log out</button>`:`<button class="pill" onclick="go('auth',{role:'c',mode:'in'})">Log in</button>`}
 function out(){ss=null;cart={};localStorage.removeItem('stq_s');go('home')}
 function toast(m){const e=$('#tt');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)}
-R.home=()=>$('#v').innerHTML=`<section class="hero"><div><h1>Order ahead.<br>Skip the queue.</h1><p class="sub">Find any hotel or restaurant, order and pay from your phone, then collect with a token. No crowd, no waiting.</p><div class="cta"><button class="btn t" onclick="go('find')">Find a hotel</button><button class="btn g" onclick="go('auth',{role:'o',mode:'up'})">Register your hotel</button></div></div>
+R.home=()=>$('#v').innerHTML=`<section class="hero">${FZ}<div><h1><span class="ln1"><i>Order ahead.</i></span><span class="ln1"><i style="--d:.12s">Skip the queue.</i></span></h1><p class="sub">Find any hotel or restaurant, order and pay from your phone, then collect with a token. No crowd, no waiting.</p><div class="cta"><button class="btn t" onclick="go('find')">Find a hotel</button><button class="btn g" onclick="go('auth',{role:'o',mode:'up'})">Register your hotel</button></div></div>
 <div class="tkt"><div class="tn">Your token</div><div class="dg">${[...'T482'].map((c,i)=>`<span style="--i:${i}">${c}</span>`).join('')}</div><div class="pf"></div><b>Spice Route Kitchen</b><small>Order ready. Skip the counter line.</small></div></section>
-<section class="sec"><h2>How it works</h2><div class="g3">${[['Search','Pick any hotel or restaurant and browse its live menu.'],['Order and pay','Add your items, pay online and get a token instantly.'],['Collect','Show your token at the counter and pick up your food.']].map((s,i)=>`<div class="st"><b>${i+1}</b><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join('')}</div></section>
-<section class="sec"><div class="own"><h2>Run a hotel or restaurant?</h2><p>Register in minutes. Take orders from your phone, mark items unavailable the moment they run out, and keep the counter calm when it gets busy.</p><button class="btn t" onclick="go('auth',{role:'o',mode:'up'})">Register your hotel</button></div></section>`;
+<section class="sec"><h2>How it works</h2><div class="g3">${[['Search','Pick any hotel or restaurant and browse its live menu.'],['Order and pay','Add your items, pay online and get a token instantly.'],['Collect','Show your token at the counter and pick up your food.']].map((s,i)=>`<div class="st rv" style="--i:${i}"><b>${i+1}</b><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join('')}</div></section>
+<section class="sec"><div class="own rv"><h2>Run a hotel or restaurant?</h2><p>Register in minutes. Take orders from your phone, mark items unavailable the moment they run out, and keep the counter calm when it gets busy.</p><button class="btn t" onclick="go('auth',{role:'o',mode:'up'})">Register your hotel</button></div></section>`;
 R.find=()=>{cs=['All',...new Set(hs().map(h=>h.cuisine))];$('#v').innerHTML=`<section class="pg"><h2>Find your hotel</h2><div class="sb"><span>🔍</span><input id="q" placeholder="Search by hotel, city or cuisine" value="${esc(qq)}" oninput="qq=this.value;grid()"></div><div class="chs">${cs.map((c,i)=>`<button class="ch ${c===fl?'on':''}" onclick="fl=cs[${i}];R.find()">${esc(c)}</button>`).join('')}</div><div class="gr" id="gr"></div></section>`;grid(1)};
 function grid(a){const t=qq.toLowerCase(),r=hs().filter(h=>(fl==='All'||h.cuisine===fl)&&(h.name+h.city+h.cuisine).toLowerCase().includes(t));$('#gr').innerHTML=r.length?r.map((h,i)=>`<article class="hc ${a?'':'na'}" style="--i:${i}" onclick="cur='${h.id}';cart={};go('menu')"><div class="th" style="background:${h.c}">${h.emoji}</div><div class="bd"><h3>${esc(h.name)}</h3><p>${esc(h.cuisine)}, ${esc(h.city)}</p><div class="mt"><span>⭐ ${h.rating}</span><span>⏱ ${h.eta} min</span></div></div></article>`).join(''):'<p class="em">No hotels match your search. Try another name or cuisine.</p>'}
 R.menu=()=>{if(!cur)return go('find');const h=H(cur),k=SK()[cur]||{};$('#v').innerHTML=`<section class="pg"><button class="bk" onclick="go('find')">← All hotels</button><div class="mh"><div class="th lg" style="background:${h.c}">${h.emoji}</div><div><h2>${esc(h.name)}</h2><p>${esc(h.cuisine)}, ${esc(h.city)}</p></div></div>${h.menu.map((m,i)=>{const o=k[m[0]];return`<div class="it ${o?'so':''}" style="--i:${i}"><span class="ie">${m[2]}</span><div class="ib"><b>${esc(m[0])}</b><small>${o?'Sold out right now':'₹'+m[1]}</small></div><div class="qt"><button ${o?'disabled':''} onclick="q(${i},-1)" aria-label="Remove one">−</button><span id="q${i}">${(cart[m[0]]||{}).q||0}</span><button ${o?'disabled':''} onclick="q(${i},1)" aria-label="Add one">+</button></div></div>`}).join('')}</section>`;bar()};
-function q(i,d){const m=H(cur).menu[i],c=cart[m[0]]||{q:0,p:m[1],e:m[2]};c.q=Math.max(0,c.q+d);c.q?cart[m[0]]=c:delete cart[m[0]];$('#q'+i).textContent=c.q;bar(1)}
+function q(i,d){const m=H(cur).menu[i],c=cart[m[0]]||{q:0,p:m[1],e:m[2]};c.q=Math.max(0,c.q+d);c.q?cart[m[0]]=c:delete cart[m[0]];$('#q'+i).textContent=c.q;if(d>0)fly(m[2],window.event&&window.event.target);bar(1)}
 function bar(b){const n=Object.values(cart).reduce((s,c)=>s+c.q,0),e=$('#cb');e.innerHTML=`<div><b>${n} item${n>1?'s':''}</b><small>₹${tot()}</small></div><button class="btn t sm" onclick="chk()">Checkout</button>`;e.classList.toggle('show',n>0);if(b){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}
 function chk(){if(!ss||ss.r!=='c'){toast('Log in to place your order');go('auth',{role:'c',mode:'in',next:'pay'})}else go('pay')}
 R.auth=a=>{A=a;const o=a.role==='o',u=a.mode==='up',f=(id,l,t='text',x='')=>`<label class="f">${l}<input id="${id}" type="${t}" ${x}></label>`,ph=f('ph','Phone number','tel','maxlength="10" inputmode="numeric"');
@@ -140,5 +165,29 @@ function fx(id,j){const os=OR(),o=os.find(x=>x.id===id),n=o.items[j].n,i=o.x.ind
 function up(id,s){const os=OR();os.find(x=>x.id===id).s=s;S('stq_o',os);toast(s==='Completed'?'Order completed':'Order rejected');ords()}
 function stock(){const h=H(ss.h),k=SK()[ss.h]||{};$('#sts').innerHTML='';$('#ol').innerHTML='<p class="hint">Switch an item off when it runs out. Customers see it as sold out straight away.</p>'+h.menu.map((m,i)=>`<label class="sw"><span>${m[2]} ${esc(m[0])}</span><input type="checkbox" ${k[m[0]]?'':'checked'} onchange="tg(${i})"><i></i></label>`).join('')}
 function tg(i){const a=SK(),n=H(ss.h).menu[i][0];a[ss.h]=a[ss.h]||{};a[ss.h][n]=!a[ss.h][n];S('stq_k',a)}
-nav();go('home');
+
+const FZ='<div class="fz" aria-hidden="true">'+['🍕','🍔','🍜','☕','🥐','🍛'].map((e,i)=>`<span style="left:${[5,34,56,90,72,16][i]}%;top:${[10,80,5,16,82,52][i]}%;--i:${i};--k:${i%3+1}">${e}</span>`).join('')+'</div>';
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,SPL=!RM&&!sessionStorage.getItem('stq_i');
+function reveal(){const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('v');io.unobserve(x.target)}}),{threshold:.15});document.querySelectorAll('.rv').forEach(el=>io.observe(el))}
+function fly(e,el){if(RM||!el)return;const a=el.getBoundingClientRect(),s=document.createElement('span'),sx=a.left+a.width/2,sy=a.top+a.height/2,dx=innerWidth/2-Math.min(innerWidth*.47,280)+60-sx,dy=innerHeight-48-sy;s.className='fly';s.textContent=e;s.style.left=sx+'px';s.style.top=sy+'px';document.body.appendChild(s);s.animate([{transform:'translate(0,0) scale(1.2)',opacity:1},{transform:`translate(${dx*.5}px,${dy*.5-80}px) scale(1.5)`,opacity:1,offset:.45},{transform:`translate(${dx}px,${dy}px) scale(.4)`,opacity:.2}],{duration:720,easing:'cubic-bezier(.5,0,.8,.6)'}).onfinish=()=>s.remove()}
+(()=>{
+if(SPL){sessionStorage.setItem('stq_i',1);const s=document.createElement('div');s.id='sp';s.innerHTML='<div class="lg2">skip<i>the</i>queue</div><div class="bar2"></div>';document.body.appendChild(s);setTimeout(()=>s.classList.add('go'),1100);setTimeout(()=>s.remove(),2000)}
+if(RM||!matchMedia('(pointer:fine)').matches)return;
+const E=['🥬','🍅','🧀','🥩'],box=document.createElement('div');box.className='trail';box.innerHTML='<svg><path/></svg>';
+const path=box.querySelector('path'),P=E.map(e=>{const d=document.createElement('div');d.className='tb';d.textContent=e;box.appendChild(d);return{d,x:-99,y:-99,r:0}});document.body.appendChild(box);
+let mx=-99,my=-99,hs=1,tg=1,mb=null;
+document.addEventListener('pointermove',e=>{
+mx=e.clientX;my=e.clientY;box.style.opacity=1;if(P[0].x<-50)P.forEach(p=>{p.x=mx;p.y=my});
+tg=e.target.closest('button,a,label,.hc,.ch,.sb')?1.3:1;
+const st=document.documentElement.style;st.setProperty('--px',(mx/innerWidth-.5).toFixed(3));st.setProperty('--py',(my/innerHeight-.5).toFixed(3));
+document.querySelectorAll('.tkt').forEach(t=>{const b=t.getBoundingClientRect(),nx=Math.max(-1,Math.min(1,(mx-b.left-b.width/2)/innerWidth*2.4)),ny=Math.max(-1,Math.min(1,(my-b.top-b.height/2)/innerHeight*2.4));t.style.transform=`perspective(800px) rotateY(${nx*14}deg) rotateX(${-ny*12}deg)`;t.style.setProperty('--sx',50+nx*45+'%');t.style.setProperty('--sy',50+ny*45+'%')});
+const b=e.target.closest('.btn:not(.sm)');if(mb&&mb!==b)mb.style.translate='';if(b){const r=b.getBoundingClientRect();b.style.translate=`${(mx-r.left-r.width/2)*.18}px ${(my-r.top-r.height/2)*.3}px`}mb=b},{passive:true});
+document.documentElement.addEventListener('mouseleave',()=>box.style.opacity=0);
+document.addEventListener('pointerdown',e=>{for(let i=0;i<9;i++){const s=document.createElement('span'),a=i/9*6.283+Math.random()*.5,d=50+Math.random()*60;s.className='bst';s.textContent=E[i%4];s.style.left=e.clientX+'px';s.style.top=e.clientY+'px';document.body.appendChild(s);s.animate([{transform:'translate(0,0) scale(.4)',opacity:1},{transform:`translate(${Math.cos(a)*d}px,${Math.sin(a)*d}px) scale(1.1) rotate(${Math.random()*200-100}deg)`,opacity:0}],{duration:650,easing:'cubic-bezier(.2,.8,.3,1)'}).onfinish=()=>s.remove()}});
+(function f(){hs+=(tg-hs)*.2;
+P.forEach((p,i)=>{const tx=i?P[i-1].x:mx+12,ty=i?P[i-1].y:my+14,ox=p.x,k=i?.3:.5;p.x+=(tx-p.x)*k;p.y+=(ty-p.y)*k;p.r+=((p.x-ox)*2.2-p.r)*.2;p.d.style.transform=`translate(${p.x}px,${p.y}px) rotate(${p.r}deg) scale(${i?1-i*.07:hs})`});
+let d=`M${P[0].x},${P[0].y}`;for(let i=1;i<4;i++){const a=P[i-1],b=P[i];d+=` Q${a.x},${a.y} ${(a.x+b.x)/2},${(a.y+b.y)/2}`}path.setAttribute('d',d+` L${P[3].x},${P[3].y}`);
+requestAnimationFrame(f)})();
+})();
+nav();setTimeout(()=>go('home'),SPL?950:0);
 </script></body></html>
