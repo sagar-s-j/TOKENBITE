@@ -102,9 +102,25 @@ h1{font-size:clamp(2rem,5.6vw,3.9rem)}.sub{font-size:1.1rem;color:var(--mu);marg
 .lg2{font-family:var(--d);font-weight:700;font-size:clamp(1.6rem,6vw,2.6rem);animation:pop .6s both}.lg2 i{font-style:normal;background:var(--ink);color:var(--tk);padding:0 10px;border-radius:8px;margin:0 6px}
 .bar2{width:170px;height:5px;border-radius:9px;background:#0B2B2A22;overflow:hidden}.bar2::after{content:'';display:block;height:100%;background:var(--ink);animation:fill 1.05s ease-in-out both}
 @keyframes fill{from{width:0}to{width:100%}}
+
+/* ===== Floating menu ===== */
+#fab{position:fixed;right:18px;bottom:18px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:14px;transition:bottom .45s cubic-bezier(.2,1.2,.3,1)}body.hc #fab{bottom:96px}
+#fo{position:fixed;inset:0;z-index:39;background:#0B2B2A66;backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s}body.fo #fo{opacity:1;pointer-events:auto}
+#fm{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fi{display:flex;align-items:center;gap:12px;background:#fff;border-radius:99px;padding:7px 20px 7px 7px;font-weight:700;box-shadow:0 12px 26px -10px #0B2B2A99;transform-origin:100% 100%;opacity:0;transform:translate(24px,50px) scale(.4) rotate(10deg);pointer-events:none;transition:transform .35s cubic-bezier(.5,0,.8,.6),opacity .2s,background .2s,translate .25s cubic-bezier(.2,1.4,.4,1);transition-delay:calc(var(--i)*25ms)}
+body.fo .fi{opacity:1;transform:none;pointer-events:auto;transition:transform .55s cubic-bezier(.2,1.5,.4,1),opacity .25s,background .2s,translate .25s cubic-bezier(.2,1.4,.4,1);transition-delay:var(--d)}
+.fi b{width:42px;height:42px;border-radius:50%;background:var(--pp);display:grid;place-items:center;font-size:1.25rem;transition:transform .3s cubic-bezier(.2,1.5,.4,1),background .2s}
+.fi:hover,.fi:focus-visible{translate:-8px 0;background:var(--tk)}.fi:hover b,.fi:focus-visible b{transform:rotate(-14deg) scale(1.18);background:#fff}
+.fi.on{background:var(--ink);color:#fff}.fi.on b{background:var(--tk)}
+#fb{position:relative;width:62px;height:62px;border-radius:50%;background:var(--tk);box-shadow:0 6px 0 #B58A00,0 18px 28px -10px #0B2B2A99;display:grid;place-content:center;gap:5px;transition:transform .2s,box-shadow .2s}
+#fb:hover{transform:translateY(-2px) rotate(-6deg)}#fb:active{transform:translateY(4px);box-shadow:0 2px 0 #B58A00}
+#fb::before{content:'';position:absolute;inset:0;border-radius:50%;border:3px solid var(--tk);animation:rg 2.4s ease-out infinite}body.fo #fb::before{animation:none;opacity:0}
+@keyframes rg{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.8);opacity:0}}
+#fb i{display:block;width:24px;height:3px;border-radius:3px;background:var(--ink);transition:transform .4s cubic-bezier(.2,1.5,.4,1),opacity .2s,width .3s}
+body.fo #fb i:nth-child(1){transform:translateY(8px) rotate(45deg)}body.fo #fb i:nth-child(2){opacity:0;width:0}body.fo #fb i:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
 </style></head><body>
 <nav><a class="logo" onclick="go('home')">skip<i>the</i>queue</a><div class="nv"><a onclick="go('find')">Find food</a><a onclick="go('auth',{role:'o',mode:'up'})">For hotels</a><span id="u"></span></div></nav>
-<main id="v"></main><div id="cb"></div><div id="ov"><i></i><p>Processing payment</p></div><div id="tt"></div>
+<main id="v"></main><div id="cb"></div><div id="ov"><i></i><p>Processing payment</p></div><div id="tt"></div><div id="fo" onclick="fab(0)"></div><div id="fab"><div id="fm"></div><button id="fb" aria-label="Open menu" aria-expanded="false" onclick="fab()"><i></i><i></i><i></i></button></div>
 <script>
 const $=s=>document.querySelector(s),L=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},S=(k,v)=>localStorage.setItem(k,JSON.stringify(v)),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const M=s=>s.split(';').map(x=>{const a=x.split('|');return[a[0],+a[1],a[2]]});
@@ -121,7 +137,7 @@ const hs=()=>SEED.concat(L('stq_h',[])),H=id=>hs().find(h=>h.id===id),OR=()=>L('
 if(!L('stq_w',null))S('stq_w',[{e:'demo@hotel.com',p:'Demo@123',h:'h1'}]);
 let ss=L('stq_s',null),cart={},cur=null,last=null,tm=null,fl='All',qq='',A={},pm=0,dt=0,cs=['All'];
 const R={};
-function go(v,a={}){clearInterval(tm);if(v!=='menu')$('#cb').className='';R[v](a);const m=$('#v');m.className='';void m.offsetWidth;m.className='in';scrollTo(0,0);nav();reveal()}
+function go(v,a={}){clearInterval(tm);if(v!=='menu'){$('#cb').className='';document.body.classList.remove('hc')}R[v](a);cv=v;const m=$('#v');m.className='';void m.offsetWidth;m.className='in';scrollTo(0,0);nav();reveal()}
 function nav(){$('#u').innerHTML=ss?`<button class="pill" onclick="go('${ss.r==='o'?'dash':'find'}')">${ss.r==='o'?'Dashboard':'Hi, '+esc(ss.n.split(' ')[0])}</button> <button class="pill g" onclick="out()">Log out</button>`:`<button class="pill" onclick="go('auth',{role:'c',mode:'in'})">Log in</button>`}
 function out(){ss=null;cart={};localStorage.removeItem('stq_s');go('home')}
 function toast(m){const e=$('#tt');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)}
@@ -133,7 +149,7 @@ R.find=()=>{cs=['All',...new Set(hs().map(h=>h.cuisine))];$('#v').innerHTML=`<se
 function grid(a){const t=qq.toLowerCase(),r=hs().filter(h=>(fl==='All'||h.cuisine===fl)&&(h.name+h.city+h.cuisine).toLowerCase().includes(t));$('#gr').innerHTML=r.length?r.map((h,i)=>`<article class="hc ${a?'':'na'}" style="--i:${i}" onclick="cur='${h.id}';cart={};go('menu')"><div class="th" style="background:${h.c}">${h.emoji}</div><div class="bd"><h3>${esc(h.name)}</h3><p>${esc(h.cuisine)}, ${esc(h.city)}</p><div class="mt"><span>⭐ ${h.rating}</span><span>⏱ ${h.eta} min</span></div></div></article>`).join(''):'<p class="em">No hotels match your search. Try another name or cuisine.</p>'}
 R.menu=()=>{if(!cur)return go('find');const h=H(cur),k=SK()[cur]||{};$('#v').innerHTML=`<section class="pg"><button class="bk" onclick="go('find')">← All hotels</button><div class="mh"><div class="th lg" style="background:${h.c}">${h.emoji}</div><div><h2>${esc(h.name)}</h2><p>${esc(h.cuisine)}, ${esc(h.city)}</p></div></div>${h.menu.map((m,i)=>{const o=k[m[0]];return`<div class="it ${o?'so':''}" style="--i:${i}"><span class="ie">${m[2]}</span><div class="ib"><b>${esc(m[0])}</b><small>${o?'Sold out right now':'₹'+m[1]}</small></div><div class="qt"><button ${o?'disabled':''} onclick="q(${i},-1)" aria-label="Remove one">−</button><span id="q${i}">${(cart[m[0]]||{}).q||0}</span><button ${o?'disabled':''} onclick="q(${i},1)" aria-label="Add one">+</button></div></div>`}).join('')}</section>`;bar()};
 function q(i,d){const m=H(cur).menu[i],c=cart[m[0]]||{q:0,p:m[1],e:m[2]};c.q=Math.max(0,c.q+d);c.q?cart[m[0]]=c:delete cart[m[0]];$('#q'+i).textContent=c.q;if(d>0)fly(m[2],window.event&&window.event.target);bar(1)}
-function bar(b){const n=Object.values(cart).reduce((s,c)=>s+c.q,0),e=$('#cb');e.innerHTML=`<div><b>${n} item${n>1?'s':''}</b><small>₹${tot()}</small></div><button class="btn t sm" onclick="chk()">Checkout</button>`;e.classList.toggle('show',n>0);if(b){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}
+function bar(b){const n=Object.values(cart).reduce((s,c)=>s+c.q,0),e=$('#cb');e.innerHTML=`<div><b>${n} item${n>1?'s':''}</b><small>₹${tot()}</small></div><button class="btn t sm" onclick="chk()">Checkout</button>`;e.classList.toggle('show',n>0);document.body.classList.toggle('hc',n>0);if(b){e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}}
 function chk(){if(!ss||ss.r!=='c'){toast('Log in to place your order');go('auth',{role:'c',mode:'in',next:'pay'})}else go('pay')}
 R.auth=a=>{A=a;const o=a.role==='o',u=a.mode==='up',f=(id,l,t='text',x='')=>`<label class="f">${l}<input id="${id}" type="${t}" ${x}></label>`,ph=f('ph','Phone number','tel','maxlength="10" inputmode="numeric"');
 $('#v').innerHTML=`<section class="au"><div class="ac"><div class="tabs"><button class="${o?'':'on'}" onclick="sw('c',A.mode)">Customer</button><button class="${o?'on':''}" onclick="sw('o',A.mode)">Hotel owner</button></div><h2>${o?(u?'Register your hotel':'Owner log in'):(u?'Create your account':'Welcome back')}</h2><p>${o?(u?'Start taking orders in minutes.':'Manage orders and menu stock.'):(u?'Order from any hotel and skip the queue.':'Log in to place your order.')}</p><div class="er" id="er"></div>${o?(u?f('nm','Hotel name')+f('ci','City')+`<label class="f">Cuisine<select id="cu">${Object.keys(EM).map(c=>`<option>${c}</option>`).join('')}</select></label>`:'')+f('em','Email','email'):(u?f('nm','Full name'):'')+ph}${f('pw','Password','password')}<button class="btn t wide" onclick="sub()">${u?'Create account':'Log in'}</button><p class="sw2">${u?'Already registered? ':'New here? '}<a onclick="sw(A.role,'${u?'in':'up'}')">${u?'Log in':(o?'Register your hotel':'Create an account')}</a></p>${o&&!u?'<div class="hn">Demo owner: demo@hotel.com / Demo@123</div>':''}</div></section>`};
@@ -189,5 +205,11 @@ P.forEach((p,i)=>{const tx=i?P[i-1].x:mx+12,ty=i?P[i-1].y:my+14,ox=p.x,k=i?.3:.5
 let d=`M${P[0].x},${P[0].y}`;for(let i=1;i<4;i++){const a=P[i-1],b=P[i];d+=` Q${a.x},${a.y} ${(a.x+b.x)/2},${(a.y+b.y)/2}`}path.setAttribute('d',d+` L${P[3].x},${P[3].y}`);
 requestAnimationFrame(f)})();
 })();
+let cv='';
+function fab(f){const o=f===undefined?!document.body.classList.contains('fo'):!!f;
+if(o){const it=[['🏠','Home',"go('home')",'home'],['🔍','Find food',"go('find')",'find'],ss&&ss.r==='o'?['📊','Dashboard',"go('dash')",'dash']:['🏨','For hotels',"go('auth',{role:'o',mode:'up'})",''],ss?['👋','Log out','out()','']:['👤','Log in',"go('auth',{role:'c',mode:'in'})",'']];
+$('#fm').innerHTML=it.map((x,i)=>`<button class="fi ${x[3]&&x[3]===cv?'on':''}" style="--i:${i};--d:${(it.length-1-i)*55}ms" onclick="fab(0);${x[2]}"><b>${x[0]}</b>${x[1]}</button>`).join('');void $('#fm').offsetWidth}
+document.body.classList.toggle('fo',o);$('#fb').setAttribute('aria-expanded',o);$('#fb').setAttribute('aria-label',o?'Close menu':'Open menu')}
+addEventListener('keydown',e=>{if(e.key==='Escape')fab(0)});
 nav();setTimeout(()=>go('home'),SPL?950:0);
 </script></body></html>
