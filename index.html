@@ -19,6 +19,8 @@ h1,h2,h3,.tn,.dg,.logo,.tk2{font-family:var(--d);font-weight:700;letter-spacing:
 @keyframes sp{to{transform:rotate(360deg)}}
 @keyframes sh{0%,100%{transform:none}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 @keyframes bm{50%{scale:1.04}}
+@keyframes qstep{0%,18%{transform:translateX(0)}42%,60%{transform:translateX(-16px)}82%,100%{transform:translateX(0)}}
+@keyframes qbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 nav{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 5vw;background:#F3F5F2e6;backdrop-filter:blur(10px);border-bottom:1px solid var(--ln)}
 .logo{font-size:1rem;cursor:pointer}.logo i{font-style:normal;background:var(--tk);padding:1px 7px;border-radius:6px;margin:0 3px}
 .nv{display:flex;align-items:center;gap:8px}.nv a{cursor:pointer;font-weight:600;padding:6px 10px}
@@ -102,6 +104,11 @@ h1{font-size:clamp(2rem,5.6vw,3.9rem)}.sub{font-size:1.1rem;color:var(--mu);marg
 .lg2{font-family:var(--d);font-weight:700;font-size:clamp(1.6rem,6vw,2.6rem);animation:pop .6s both}.lg2 i{font-style:normal;background:var(--ink);color:var(--tk);padding:0 10px;border-radius:8px;margin:0 6px}
 .bar2{width:170px;height:5px;border-radius:9px;background:#0B2B2A22;overflow:hidden}.bar2::after{content:'';display:block;height:100%;background:var(--ink);animation:fill 1.05s ease-in-out both}
 @keyframes fill{from{width:0}to{width:100%}}
+.queue-scene{width:220px;height:58px;display:flex;align-items:flex-end;justify-content:center;gap:12px;position:relative;margin-top:2px;padding-bottom:8px;border-bottom:3px solid #0B2B2A44}
+.queue-scene::before{content:'COUNTER';position:absolute;right:-2px;bottom:11px;background:var(--ink);color:var(--tk);font:700 8px/1 var(--d);letter-spacing:.04em;padding:5px 6px;border-radius:4px;transform:rotate(-4deg)}
+.person{width:22px;height:38px;position:relative;display:block;transform-origin:50% 100%;animation:qstep 2.8s calc(var(--i)*.22s) ease-in-out infinite}
+.person::before{content:'';position:absolute;top:0;left:5px;width:12px;height:12px;border-radius:50%;background:var(--ink);animation:qbob 1.4s calc(var(--i)*.12s) ease-in-out infinite}
+.person::after{content:'';position:absolute;top:14px;left:2px;width:18px;height:21px;border-radius:9px 9px 5px 5px;background:var(--c,var(--gr));box-shadow:-5px 17px 0 -7px var(--ink),5px 17px 0 -7px var(--ink)}
 
 /* ===== Floating menu ===== */
 #fab{position:fixed;right:18px;bottom:18px;z-index:40;display:flex;flex-direction:column;align-items:flex-end;gap:14px;transition:bottom .45s cubic-bezier(.2,1.2,.3,1)}body.hc #fab{bottom:96px}
@@ -187,7 +194,7 @@ const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,SPL=!RM&&!session
 function reveal(){const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('v');io.unobserve(x.target)}}),{threshold:.15});document.querySelectorAll('.rv').forEach(el=>io.observe(el))}
 function fly(e,el){if(RM||!el)return;const a=el.getBoundingClientRect(),s=document.createElement('span'),sx=a.left+a.width/2,sy=a.top+a.height/2,dx=innerWidth/2-Math.min(innerWidth*.47,280)+60-sx,dy=innerHeight-48-sy;s.className='fly';s.textContent=e;s.style.left=sx+'px';s.style.top=sy+'px';document.body.appendChild(s);s.animate([{transform:'translate(0,0) scale(1.2)',opacity:1},{transform:`translate(${dx*.5}px,${dy*.5-80}px) scale(1.5)`,opacity:1,offset:.45},{transform:`translate(${dx}px,${dy}px) scale(.4)`,opacity:.2}],{duration:720,easing:'cubic-bezier(.5,0,.8,.6)'}).onfinish=()=>s.remove()}
 (()=>{
-if(SPL){sessionStorage.setItem('stq_i',1);const s=document.createElement('div');s.id='sp';s.innerHTML='<div class="lg2">skip<i>the</i>queue</div><div class="bar2"></div>';document.body.appendChild(s);setTimeout(()=>s.classList.add('go'),1100);setTimeout(()=>s.remove(),2000)}
+if(SPL){sessionStorage.setItem('stq_i',1);const s=document.createElement('div');s.id='sp';s.innerHTML='<div class="lg2">skip<i>the</i>queue</div><div class="queue-scene" aria-label="People moving through a queue"><span class="person" style="--i:0;--c:#1FB57A"></span><span class="person" style="--i:1;--c:#E5484D"></span><span class="person" style="--i:2;--c:#5B8DEF"></span><span class="person" style="--i:3;--c:#8D63D2"></span><span class="person" style="--i:4;--c:#F08A45"></span></div><div class="bar2"></div>';document.body.appendChild(s);setTimeout(()=>s.classList.add('go'),1100);setTimeout(()=>s.remove(),2000)}
 if(RM||!matchMedia('(pointer:fine)').matches)return;
 const E=['🥬','🍅','🧀','🥩'],box=document.createElement('div');box.className='trail';box.innerHTML='<svg><path/></svg>';
 const path=box.querySelector('path'),P=E.map(e=>{const d=document.createElement('div');d.className='tb';d.textContent=e;box.appendChild(d);return{d,x:-99,y:-99,r:0}});document.body.appendChild(box);
